@@ -4,7 +4,7 @@ package
 
     public class CreditsState extends FlxState
     {
-        [Embed(source="media/credits.png")] public var credits_image:Class;
+        [Embed(source="../media/credits.png")] public var credits_image:Class;
 
         override public function create():void
         {

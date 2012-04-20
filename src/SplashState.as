@@ -4,7 +4,7 @@ package
 
     public class SplashState extends FlxState
     {
-        [Embed(source="media/splash.png")] public var splash_image:Class;
+        [Embed(source="../media/splash.png")] public var splash_image:Class;
 
         override public function create():void
         {

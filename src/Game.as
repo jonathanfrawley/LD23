@@ -8,9 +8,9 @@ package
     {
         public function Game()
         {
-            super(320,240,PlayState,2);
-//            super(640,480,SplashState,1);
-            forceDebugger = true;
+//            super(640,480,PlayState,2);
+            super(640,480,SplashState,1);
+//            forceDebugger = true;
         }
     }
 }

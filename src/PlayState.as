@@ -4,9 +4,9 @@ package
 
     public class PlayState extends FlxState
     {
-        [Embed(source="media/back.jpg")]
+        [Embed(source="../media/back.jpg")]
             private var BackgroundImageClass:Class;
-        [Embed(source="media/greenBlock.png")] public var PlayerImage:Class;
+        [Embed(source="../media/greenBlock.png")] public var PlayerImage:Class;
 
         private var background:FlxSprite;
         private var player:FlxSprite;
