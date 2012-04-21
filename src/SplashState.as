@@ -41,8 +41,8 @@ package
             // checking if the player pressed SPACE...
             if (FlxG.keys.pressed("SPACE"))
             {
-                FlxG.switchState(new PlayState());
-            //    FlxG.switchState(new CreditsState());
+            //    FlxG.switchState(new PlayState());
+                FlxG.switchState(new StoryState());
             }
             super.update();
         }

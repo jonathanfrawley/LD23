@@ -6,6 +6,9 @@ package
     {
         [Embed(source="../media/back.png")] private var BackgroundImageClass:Class;
         [Embed(source="../media/particle.png")] private var RockParticleImage:Class;
+        [Embed(source = "../media/explosion0.mp3")] private var ExplosionSound0:Class;
+        [Embed(source = "../media/explosion1.mp3")] private var ExplosionSound1:Class;
+        [Embed(source = "../media/fire.mp3")] private var FireSound:Class;
 //        [Embed(source="../media/litteworld.png")] public var PlayerImage:Class;
 //        [Embed(source="../media/rock.png")] public var RockImage:Class;
 
@@ -13,6 +16,7 @@ package
         private var player:Player;
 //        private var rock:FlxSprite;
         private var rocks:FlxGroup;
+        private var enemyShips:FlxGroup;
         private var bullets:FlxGroup;
         private var cursor:Cursor;
         private var explosions:FlxGroup;
@@ -23,6 +27,8 @@ package
         private var winTimer:Number;
         private var win:Boolean;
         private var winTimerText:FlxText;
+
+        //private var explosionSound0:FlxSound;
 
         override public function create():void
         {
@@ -60,6 +66,10 @@ package
             spawnRock();
 */
 
+            //Enemy Ships
+            enemyShips = new FlxGroup();
+            add(enemyShips);
+
             //Bullets
             bullets = new FlxGroup();
             add(bullets);
@@ -84,6 +94,8 @@ package
             winTimerText = new FlxText(0, 0, FlxG.width, new String(winTimer));
             winTimerText.setFormat(null, 16, 0x76a2c4, "center");
             add(winTimerText);
+
+            //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
         }
 
         override public function update():void
@@ -117,6 +129,8 @@ package
                 FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
                 FlxG.overlap(explosions, rocks, overlapExplosionRocks);
                 FlxG.overlap(rocks, player, overlapRocksPlayer);
+                FlxG.overlap(enemyShips, player, overlapShipsPlayer);
+                FlxG.overlap(enemyShips, explosions, overlapShipsExplosions);
 
                 //Simple ai movement
                 //rock.x += 5;
@@ -125,12 +139,20 @@ package
                     var bullet:Bullet = new Bullet(this, player.realx, player.realy, FlxG.mouse.x, FlxG.mouse.y)
                     bullets.add(bullet);
                     explosionSpots.add(new ExplosionSpot(FlxG.mouse.x, FlxG.mouse.y,bullet.id));
+                    FlxG.play(FireSound);
                 }
 
                 spawnTimer -= FlxG.elapsed;
                 if(spawnTimer < 0)
                 {
-                    spawnRock();
+                    if(Math.round(Math.random())==0)
+                    {
+                        spawnRock();
+                    }
+                    else
+                    {
+                        spawnEnemyShip();
+                    }
                     resetSpawnTimer();
                 }
 
@@ -156,7 +178,7 @@ package
 
         private function spawnRock():void
         {
-            var type:int = Math.round(Math.random() * 4);
+            var type:int = Math.round(Math.random() * 3);
             var x: Number;
             var y: Number;
             if(type == 0)
@@ -183,6 +205,58 @@ package
             rocks.add(new Rock(x, y, type));
         }
 
+        private function spawnEnemyShip():void
+        {
+            var type:int = Math.round(Math.random() * 3);
+            //var type:int = 0;
+            var x: Number;
+            var y: Number;
+/*
+            if(type == 0)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = FlxG.height;
+            }
+            else if(type == 1)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = 0;
+            }
+            else if(type == 2)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = FlxG.height;
+            }
+            else if(type == 3)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = 0;
+            }
+*/
+            if(type == 0)
+            {
+                x = FlxG.width;
+                y = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+            }
+            else if(type == 1)
+            {
+                x = 0;
+                y = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+            }
+            else if(type == 2)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = FlxG.height;
+            }
+            else if(type == 3)
+            {
+                x = (Math.random() * (FlxG.height - 100.0)) + 50.0;
+                y = 0;
+            }
+                //var type:int = Math.round(Math.random());
+            enemyShips.add(new EnemyShip(x, y, type));
+        }
+
         private function overlapExplosionSpotsBullets(explosionSpot: ExplosionSpot, bullet: Bullet):void
         {
             if(explosionSpot.id == bullet.id)
@@ -193,6 +267,7 @@ package
                 explosions.add(new Explosion(explosionSpot.realx, explosionSpot.realy));
                 bullet.kill();
                 explosionSpot.kill();
+                FlxG.play(ExplosionSound1);
             }
 //            FlxG.score += 1;
 //            scoreText.text = FlxG.score.toString();
@@ -230,6 +305,8 @@ package
             var emitter:FlxEmitter = createRockEmitter();
             emitter.at(rock);
             rock.kill();
+            FlxG.play(ExplosionSound0,1,false);
+            //explosionSound0.play();
         }
 
         private function overlapRocksPlayer(rock: Rock, player:Player):void
@@ -247,6 +324,8 @@ package
             add(gameOverText);
 //            FlxG.play(SoundExplosionShip);
             gameOver = true;
+            FlxG.play(ExplosionSound0,1,false);
+            //explosionSound0.play();
         }
 
         private function resetSpawnTimer():void
@@ -259,6 +338,35 @@ package
                 spawnInterval = 0.1;
             }
 */
+        }
+
+        private function overlapShipsPlayer(ship:EnemyShip, player:Player):void
+        {
+            var emitter:FlxEmitter = createRockEmitter();
+            emitter.at(player);
+
+            player.kill();
+            ship.kill();
+            FlxG.shake(0.02);
+
+            var gameOverText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
+                    "GAME OVER\nPress space to restart");
+            gameOverText.setFormat(null, 16, 0x76a2c4, "center");
+            add(gameOverText);
+//            FlxG.play(SoundExplosionShip);
+            gameOver = true;
+            FlxG.play(ExplosionSound0,1,false);
+            //explosionSound0.play();
+        }
+
+        private function overlapShipsExplosions(ship:EnemyShip, explosion:Explosion):void
+        {
+            //explosionSound0.play();
+
+            var emitter:FlxEmitter = createRockEmitter();
+            emitter.at(ship);
+            ship.kill();
+            FlxG.play(ExplosionSound0,1,false);
         }
 
     }
