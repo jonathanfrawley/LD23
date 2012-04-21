@@ -16,9 +16,12 @@ package
         private var cursor:Cursor;
         private var explosions:FlxGroup;
         private var explosionSpots:FlxGroup;
+        private var gameOver:Boolean;
 
         override public function create():void
         {
+            gameOver = false;
+
             //Background
             background = new FlxSprite(0, 0, BackgroundImageClass);
             add(background);
@@ -41,8 +44,12 @@ package
             //Rocks
             rocks = new FlxGroup();
             add(rocks);
-//            spawnRock();
-//            spawnRock();
+            spawnRock();
+            spawnRock();
+            spawnRock();
+            spawnRock();
+            spawnRock();
+            spawnRock();
 
             //Bullets
             bullets = new FlxGroup();
@@ -73,16 +80,27 @@ package
             if(FlxG.keys.DOWN)
                 player.y += 2;
 */
-
-            FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
-
-            //Simple ai movement
-            //rock.x += 5;
-            if(FlxG.mouse.justPressed())
+            if(gameOver)
             {
-                var bullet:Bullet = new Bullet(this, player.realx, player.realy, FlxG.mouse.x, FlxG.mouse.y)
-                bullets.add(bullet);
-                explosionSpots.add(new ExplosionSpot(FlxG.mouse.x, FlxG.mouse.y, 16, 16, bullet.id));
+                if(FlxG.keys.justPressed("SPACE"))
+                {
+                    FlxG.switchState(new PlayState());
+                }
+            }
+            else
+            {
+                FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
+                FlxG.overlap(explosions, rocks, overlapExplosionRocks);
+                FlxG.overlap(rocks, player, overlapRocksPlayer);
+
+                //Simple ai movement
+                //rock.x += 5;
+                if(FlxG.mouse.justPressed())
+                {
+                    var bullet:Bullet = new Bullet(this, player.realx, player.realy, FlxG.mouse.x, FlxG.mouse.y)
+                    bullets.add(bullet);
+                    explosionSpots.add(new ExplosionSpot(FlxG.mouse.x, FlxG.mouse.y,bullet.id));
+                }
             }
 
             super.update();
@@ -130,6 +148,7 @@ package
                 var emitter:FlxEmitter = createEmitter();
                 emitter.at(explosionSpot);
 
+                explosions.add(new Explosion(explosionSpot.x, explosionSpot.y));
                 bullet.kill();
                 explosionSpot.kill();
             }
@@ -163,6 +182,29 @@ package
             add(emitter);
             return emitter;
         }
+
+        private function overlapExplosionRocks(explosion: Explosion, rock: Rock):void
+        {
+            rock.kill();
+        }
+
+        private function overlapRocksPlayer(rock: Rock, player:Player):void
+        {
+            var emitter:FlxEmitter = createEmitter();
+            emitter.at(player);
+
+            player.kill();
+            rock.kill();
+            FlxG.shake(0.02);
+
+            var gameOverText:FlxText = new FlxText(0, FlxG.height / 2, FlxG.width,
+                    "GAME OVER\nPress space to restart");
+            gameOverText.setFormat(null, 16, 0x76a2c4, "center");
+            add(gameOverText);
+//            FlxG.play(SoundExplosionShip);
+            gameOver = true;
+        }
+
 
     }
 }
