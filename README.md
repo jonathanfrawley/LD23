@@ -1,4 +1,4 @@
-LD22
+LD23
 ====
 
-Ludum Dare 22 Entry
+Ludum Dare 23 Entry
