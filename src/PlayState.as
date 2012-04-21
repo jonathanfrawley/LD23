@@ -5,6 +5,7 @@ package
     public class PlayState extends FlxState
     {
         [Embed(source="../media/back.png")] private var BackgroundImageClass:Class;
+        [Embed(source="../media/particle.png")] private var RockParticleImage:Class;
 //        [Embed(source="../media/litteworld.png")] public var PlayerImage:Class;
 //        [Embed(source="../media/rock.png")] public var RockImage:Class;
 
@@ -17,10 +18,16 @@ package
         private var explosions:FlxGroup;
         private var explosionSpots:FlxGroup;
         private var gameOver:Boolean;
+        private var spawnTimer:Number;
+        private var spawnInterval:Number = 2.5;
+        private var winTimer:Number;
+        private var win:Boolean;
+        private var winTimerText:FlxText;
 
         override public function create():void
         {
             gameOver = false;
+            win = false;
 
             //Background
             background = new FlxSprite(0, 0, BackgroundImageClass);
@@ -44,12 +51,14 @@ package
             //Rocks
             rocks = new FlxGroup();
             add(rocks);
+/*
             spawnRock();
             spawnRock();
             spawnRock();
             spawnRock();
             spawnRock();
             spawnRock();
+*/
 
             //Bullets
             bullets = new FlxGroup();
@@ -66,6 +75,15 @@ package
             //Explosion spots, where we click
             explosionSpots = new FlxGroup();
             add(explosionSpots);
+
+            //reset spawn timer
+            resetSpawnTimer();
+
+            winTimer = 30;
+
+            winTimerText = new FlxText(0, 0, FlxG.width, new String(winTimer));
+            winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+            add(winTimerText);
         }
 
         override public function update():void
@@ -87,6 +105,13 @@ package
                     FlxG.switchState(new PlayState());
                 }
             }
+            else if(win)
+            {
+                if(FlxG.keys.justPressed("SPACE"))
+                {
+                    FlxG.switchState(new PlayState());
+                }
+            }
             else
             {
                 FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
@@ -101,6 +126,29 @@ package
                     bullets.add(bullet);
                     explosionSpots.add(new ExplosionSpot(FlxG.mouse.x, FlxG.mouse.y,bullet.id));
                 }
+
+                spawnTimer -= FlxG.elapsed;
+                if(spawnTimer < 0)
+                {
+                    spawnRock();
+                    resetSpawnTimer();
+                }
+
+                winTimer -= FlxG.elapsed;
+                if(winTimer < 0)
+                {
+                    win = true;
+                    var winText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
+                            "You Win\nPress space to continue");
+                    winText.setFormat(null, 16, 0x76a2c4, "center");
+                    add(winText);
+                }
+
+                winTimerText.kill();
+                winTimerText = new FlxText(0, 0, FlxG.width, new String(Math.round(winTimer)));
+                winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+                add(winTimerText)
+
             }
 
             super.update();
@@ -135,20 +183,14 @@ package
             rocks.add(new Rock(x, y, type));
         }
 
-        public function spawnExplosion(x:Number, y:Number):void
-        {
-            //explosions.add(new Explosion(x,y, 32, 32));
-            spawnRock();
-        }
-
         private function overlapExplosionSpotsBullets(explosionSpot: ExplosionSpot, bullet: Bullet):void
         {
             if(explosionSpot.id == bullet.id)
             {
-                var emitter:FlxEmitter = createEmitter();
-                emitter.at(explosionSpot);
+//                var emitter:flxemitter = createrockemitter();
+//                emitter.at(explosionspot);
 
-                explosions.add(new Explosion(explosionSpot.x, explosionSpot.y));
+                explosions.add(new Explosion(explosionSpot.realx, explosionSpot.realy));
                 bullet.kill();
                 explosionSpot.kill();
             }
@@ -158,7 +200,7 @@ package
 
         }
 
-        private function createEmitter():FlxEmitter
+        private function createRockEmitter():FlxEmitter
         {
             var emitter:FlxEmitter = new FlxEmitter();
             //emitter.delay = 1;
@@ -176,7 +218,7 @@ package
                 emitter.add(particle);
             }
 
-//            emitter.makeParticles(Bullet)
+            emitter.makeParticles(RockParticleImage)
 
             emitter.start();
             add(emitter);
@@ -185,19 +227,21 @@ package
 
         private function overlapExplosionRocks(explosion: Explosion, rock: Rock):void
         {
+            var emitter:FlxEmitter = createRockEmitter();
+            emitter.at(rock);
             rock.kill();
         }
 
         private function overlapRocksPlayer(rock: Rock, player:Player):void
         {
-            var emitter:FlxEmitter = createEmitter();
+            var emitter:FlxEmitter = createRockEmitter();
             emitter.at(player);
 
             player.kill();
             rock.kill();
             FlxG.shake(0.02);
 
-            var gameOverText:FlxText = new FlxText(0, FlxG.height / 2, FlxG.width,
+            var gameOverText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
                     "GAME OVER\nPress space to restart");
             gameOverText.setFormat(null, 16, 0x76a2c4, "center");
             add(gameOverText);
@@ -205,6 +249,17 @@ package
             gameOver = true;
         }
 
+        private function resetSpawnTimer():void
+        {
+            spawnTimer = spawnInterval;
+/*
+            spawnInterval *= 0.95;
+            if(spawnInterval < 0.1)
+            {
+                spawnInterval = 0.1;
+            }
+*/
+        }
 
     }
 }

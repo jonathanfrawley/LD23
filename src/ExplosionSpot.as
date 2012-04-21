@@ -8,11 +8,15 @@ package
 
         private var w : Number = 4;
         private var h : Number = 4;
-
+        public var realx:Number;
+        public var realy:Number;
         public var id:int;
+
         public function ExplosionSpot(x: Number, y: Number, id:int):void
         {
             super(x - w, y - h, ExplosionSpotImage);
+            realx = x;
+            realy = y;
             this.id = id;
         }
 
