@@ -12,7 +12,7 @@ package
             super(640,480,SplashState,1);
             //super(640,480,CreditsState,1);
 //            super(640,480,StoryState2,1);
-            forceDebugger = true;
+            forceDebugger = false;
         }
     }
 }

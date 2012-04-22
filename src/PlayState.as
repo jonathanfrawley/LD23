@@ -620,33 +620,33 @@ package
             if(level==0)
             {
                 spawnInterval = 2.5;
-                //winTimer = 30;
-                winTimer = 3;
+                winTimer = 30;
+                //winTimer = 3;
             }
             else if(level==1)
             {
                 spawnInterval = 1.5;
-                //winTimer = 60;
-                winTimer = 3;
+                winTimer = 60;
+                //winTimer = 3;
             }
             else if(level==2)
             {
                 spawnInterval = 1.0;
-                //winTimer = 80;
-                winTimer = 3;
+                winTimer = 80;
+                //winTimer = 3;
             }
             else if(level==3)
             {
                 spawnInterval = 1.0;
-                //winTimer = 120;
-                winTimer = 3;
+                winTimer = 120;
+                //winTimer = 3;
             }
             else if(level==10)
             {
                 spawnInterval = 1.0;
                 //winTimer = 30;
-                //winTimer = 100000000;
-                winTimer = 3;
+                winTimer = 100000000;
+                //winTimer = 3;
             }
             resetSpawnTimer();
             resetWaveTimer();
