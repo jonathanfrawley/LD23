@@ -9,6 +9,8 @@ package
         [Embed(source = "../media/explosion0.mp3")] private var ExplosionSound0:Class;
         [Embed(source = "../media/explosion1.mp3")] private var ExplosionSound1:Class;
         [Embed(source = "../media/fire.mp3")] private var FireSound:Class;
+        //[Embed(source = "../media/music_0.mp3")] private var Music0:Class;
+        [Embed(source = "../media/music_4.mp3")] private var Music0:Class;
 //        [Embed(source="../media/litteworld.png")] public var PlayerImage:Class;
 //        [Embed(source="../media/rock.png")] public var RockImage:Class;
 
@@ -27,11 +29,17 @@ package
         private var winTimer:Number;
         private var win:Boolean;
         private var winTimerText:FlxText;
+        private var level:int;
+        private static var currentMusic:int = -1;
 
         //private var explosionSound0:FlxSound;
 
         override public function create():void
         {
+            init();
+/*
+            level = 0;
+
             gameOver = false;
             win = false;
 
@@ -45,26 +53,10 @@ package
             player.maxVelocity.y = 80;
             add(player);
 
-            /*
-            //Create rock
-            rock = new FlxSprite((FlxG.width/4)-32, (FlxG.height/4)-32, RockImage);
-            rock.maxVelocity.x = 80;
-            rock.maxVelocity.y = 80;
-            add(rock);
-            super.create();
-            */
 
             //Rocks
             rocks = new FlxGroup();
             add(rocks);
-/*
-            spawnRock();
-            spawnRock();
-            spawnRock();
-            spawnRock();
-            spawnRock();
-            spawnRock();
-*/
 
             //Enemy Ships
             enemyShips = new FlxGroup();
@@ -96,10 +88,76 @@ package
             add(winTimerText);
 
             //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
+*/
+        }
+
+        private function init():void
+        {
+            level = 0;
+
+            gameOver = false;
+            win = false;
+
+            //Background
+            background = new FlxSprite(0, 0, BackgroundImageClass);
+            add(background);
+
+            //Create player
+            player = new Player((FlxG.width/2), (FlxG.height/2), 32, 32);
+            player.maxVelocity.x = 80;
+            player.maxVelocity.y = 80;
+            add(player);
+
+            /*
+            //Create rock
+            rock = new FlxSprite((FlxG.width/4)-32, (FlxG.height/4)-32, RockImage);
+            rock.maxVelocity.x = 80;
+            rock.maxVelocity.y = 80;
+            add(rock);
+            super.create();
+            */
+
+            //Rocks
+            rocks = new FlxGroup();
+            add(rocks);
+
+            //Enemy Ships
+            enemyShips = new FlxGroup();
+            add(enemyShips);
+
+            //Bullets
+            bullets = new FlxGroup();
+            add(bullets);
+
+            //Cursor
+            cursor = new Cursor();
+            add(cursor);
+
+            //Explosions
+            explosions = new FlxGroup();
+            add(explosions);
+
+            //Explosion spots, where we click
+            explosionSpots = new FlxGroup();
+            add(explosionSpots);
+
+            //reset spawn timer
+            resetSpawnTimer();
+
+            //winTimer = 30;
+            winTimer = 30;
+
+
+            winTimerText = new FlxText(0, 0, FlxG.width, new String(winTimer));
+            winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+            add(winTimerText);
+
+            //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
         }
 
         override public function update():void
         {
+
 /*
             if(FlxG.keys.LEFT)
                 player.x -= 2;
@@ -114,18 +172,35 @@ package
             {
                 if(FlxG.keys.justPressed("SPACE"))
                 {
-                    FlxG.switchState(new PlayState());
+                    //var newState:PlayState = new PlayState();
+                    //newState.setLevel(level);
+                    //FlxG.switchState(newState);
+                    init();
                 }
             }
             else if(win)
             {
                 if(FlxG.keys.justPressed("SPACE"))
                 {
-                    FlxG.switchState(new PlayState());
+                    //var newState:PlayState = new PlayState();
+                    //newState.setLevel(level+1);
+                    //FlxG.switchState(newState);
+                    init();
+                    setLevel(level+1);
                 }
             }
             else
             {
+
+                if(currentMusic != level)
+                {
+                    if(FlxG.music == null)
+                    {
+                        FlxG.playMusic(Music0,1);
+                        currentMusic = level;
+                    }
+                }
+
                 FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
                 FlxG.overlap(explosions, rocks, overlapExplosionRocks);
                 FlxG.overlap(rocks, player, overlapRocksPlayer);
@@ -367,6 +442,12 @@ package
             emitter.at(ship);
             ship.kill();
             FlxG.play(ExplosionSound0,1,false);
+        }
+
+        public function setLevel(level:int):void
+        {
+            this.level = level;
+            //Do some extra stuff here...
         }
 
     }
