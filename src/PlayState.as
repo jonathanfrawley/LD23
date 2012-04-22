@@ -11,7 +11,13 @@ package
         [Embed(source = "../media/explosion1.mp3")] private var ExplosionSound1:Class;
         [Embed(source = "../media/fire.mp3")] private var FireSound:Class;
         //[Embed(source = "../media/music_0.mp3")] private var Music0:Class;
-        [Embed(source = "../media/music_4.mp3")] private var Music0:Class;
+        [Embed(source = "../media/music_0.mp3")] private var Music0:Class;
+        [Embed(source = "../media/music_1.mp3")] private var Music1:Class;
+        [Embed(source = "../media/music_2.mp3")] private var Music2:Class;
+        [Embed(source = "../media/music_3.mp3")] private var Music3:Class;
+        [Embed(source = "../media/music_4.mp3")] private var Music4:Class;
+        [Embed(source="../media/04B_03__.ttf", fontFamily="04B", embedAsCFF="false")] public var FontTypeface:String;
+
 //        [Embed(source="../media/litteworld.png")] public var PlayerImage:Class;
 //        [Embed(source="../media/rock.png")] public var RockImage:Class;
 
@@ -48,15 +54,15 @@ package
         private var playerHealthSprite1:FlxSprite;
         private var playerHealthSprite2:FlxSprite;
 
-        private static var kittenChance:int = 0.5;
-        //private static var kittenChance:int = 1.0;
+        //private static var kittenChance:int = 0.5;
+        private static var kittenChance:int = 1.0;
 
         //private var explosionSound0:FlxSound;
 
         override public function create():void
         {
             init();
-            //FlxG.level=10;
+            //FlxG.level=1;
             setLevel(FlxG.level);
             //setLevel(1);
         }
@@ -64,6 +70,8 @@ package
         public function init():void
         {
 //            level = FlxG.Level;
+
+            FlxG.score=0;
 
             gameOver = false;
             win = false;
@@ -117,15 +125,15 @@ package
 
             winTimer = 30;
             winTimerText = new FlxText(0, 0, FlxG.width, "");
-            winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+            winTimerText.setFormat("04B", 16, 0x76a2c4, "center");
             add(winTimerText);
 
             waveTimerText = new FlxText(0, 0, FlxG.width, "");
-            waveTimerText.setFormat(null, 16, 0x76a2c4, "left");
+            waveTimerText.setFormat("04B", 16, 0x76a2c4, "left");
             add(waveTimerText);
 
             scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "Level:" + new String(level));
-            scoreText.setFormat(null, 16, 0x76a2c4, "right");
+            scoreText.setFormat("04B", 16, 0x76a2c4, "right");
             add(scoreText);
 
             //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
@@ -135,16 +143,16 @@ package
             kittensAnimated = new FlxGroup();
             add(kittensAnimated);
 
-            spawnKittenAnimated(10,10);
-            spawnKitten(10,10);
+//            spawnKittenAnimated(10,10);
+//            spawnKitten(10,10);
 
             healthText = new FlxText(0, 0, FlxG.width, "Level:" + new String(level));
-            healthText.setFormat(null, 16, 0x76a2c4, "left");
+            healthText.setFormat("04B", 16, 0x76a2c4, "left");
             add(healthText);
 
             playerHealth = 3;
 
-            var xoffset:int = 74;
+            var xoffset:int = 60;
             var yoffset:int = 4;
             playerHealthSprite0 = new FlxSprite(xoffset,yoffset,HealthImage);
             add(playerHealthSprite0);
@@ -152,6 +160,7 @@ package
             add(playerHealthSprite1);
             playerHealthSprite2 = new FlxSprite(xoffset + 40,yoffset,HealthImage);
             add(playerHealthSprite2);
+
         }
 
         override public function update():void
@@ -174,8 +183,9 @@ package
                     //var newState:PlayState = new PlayState();
                     //newState.setLevel(level);
                     //FlxG.switchState(newState);
-                    init();
-                    setLevel(this.level);
+//                    init();
+//                    setLevel(this.level);
+                    FlxG.switchState(new PlayState());
                 }
             }
             else if(win)
@@ -222,16 +232,36 @@ package
             }
             else
             {
-
+/*
                 if(currentMusic != level)
                 {
                     if(FlxG.music == null)
                     {
                         //TODO:Enable for multiple levels
-                        FlxG.playMusic(Music0,1);
+                        if(level==0)
+                        {
+                            FlxG.playMusic(Music0,1);
+                        }
+                        else if(level==1)
+                        {
+                            FlxG.playMusic(Music1,1);
+                        }
+                        else if(level==2)
+                        {
+                            FlxG.playMusic(Music2,1);
+                        }
+                        else if(level==3)
+                        {
+                            FlxG.playMusic(Music3,1);
+                        }
+                        else if(level==10)
+                        {
+                            FlxG.playMusic(Music4,1);
+                        }
                         currentMusic = level;
                     }
                 }
+*/
 
                 FlxG.overlap(explosionSpots, bullets, overlapExplosionSpotsBullets);
                 FlxG.overlap(explosions, rocks, overlapExplosionRocks);
@@ -278,7 +308,7 @@ package
                     {
                         waveTimerText.kill();
                         waveTimerText = new FlxText(0, 100, FlxG.width, "NEXT WAVE IN: " + new String(Math.round(waveTimer)));
-                        waveTimerText.setFormat(null, 16, 0xbf4949, "center");
+                        waveTimerText.setFormat("04B", 16, 0xbf4949, "center");
                         add(waveTimerText)
                     }
                     else
@@ -298,26 +328,26 @@ package
                     {
                         win = true;
                         var winText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
-                                "You Win\nScore:" + new String(FlxG.score) + "\nPress space to continue");
-                        winText.setFormat(null, 16, 0x5cbf49, "center");
+                                "You Win\nScore:" + new String(FlxG.score) + "\n \nPress space to continue");
+                        winText.setFormat("04B", 16, 0x5cbf49, "center");
                         add(winText);
                     }
 
                     winTimerText.kill();
                     winTimerText = new FlxText(0, 0, FlxG.width, new String(Math.round(winTimer)));
-                    winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+                    winTimerText.setFormat("04B", 16, 0x76a2c4, "center");
                     add(winTimerText)
 
                     scoreText.kill();
                     scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "\nLevel:" + new String(level));
-                    scoreText.setFormat(null, 16, 0x76a2c4, "right");
+                    scoreText.setFormat("04B", 16, 0x76a2c4, "right");
                     add(scoreText);
                 }
                 else
                 {
                     scoreText.kill();
                     scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "\nLevel: Infinite");
-                    scoreText.setFormat(null, 16, 0x76a2c4, "right");
+                    scoreText.setFormat("04B", 16, 0x76a2c4, "right");
                     add(scoreText);
                 }
             }
@@ -475,10 +505,11 @@ package
         {
             if(playerHealth==0)
             {
+                playerHealthSprite0.kill();
                 player.kill();
                 var gameOverText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
-                        "GAME OVER\nScore:" + new String(FlxG.score) + "\nPress space to restart");
-                gameOverText.setFormat(null, 16, 0xbf4949, "center");
+                        "GAME OVER\nScore:" + new String(FlxG.score) + "\n \nPress space to restart");
+                gameOverText.setFormat("04B", 16, 0xbf4949, "center");
                 add(gameOverText);
     //            FlxG.play(SoundExplosionShip);
                 gameOver = true;
@@ -544,7 +575,7 @@ package
 /*
             var gameOverText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
                     "GAME OVER\nPress space to restart");
-            gameOverText.setFormat(null, 16, 0xbf4949, "center");
+            gameOverText.setFormat("04B", 16, 0xbf4949, "center");
             add(gameOverText);
 //            FlxG.play(SoundExplosionShip);
             gameOver = true;
@@ -557,8 +588,8 @@ package
         {
             //explosionSound0.play();
 
-            var emitter:FlxEmitter = createRockEmitter();
-            emitter.at(ship);
+//            var emitter:FlxEmitter = createRockEmitter();
+//            emitter.at(ship);
             ship.kill();
             FlxG.play(ExplosionSound0,1,false);
             FlxG.score += 100;
@@ -595,34 +626,37 @@ package
             else if(level==1)
             {
                 spawnInterval = 1.5;
-                //winTimer = 30;
+                //winTimer = 60;
                 winTimer = 3;
             }
             else if(level==2)
             {
                 spawnInterval = 1.0;
-                //winTimer = 30;
+                //winTimer = 80;
                 winTimer = 3;
             }
             else if(level==3)
             {
-                spawnInterval = 0.5;
-                //winTimer = 30;
+                spawnInterval = 1.0;
+                //winTimer = 120;
                 winTimer = 3;
             }
             else if(level==10)
             {
-                spawnInterval = 0.5;
+                spawnInterval = 1.0;
                 //winTimer = 30;
-                winTimer = 100000000;
+                //winTimer = 100000000;
+                winTimer = 3;
             }
             resetSpawnTimer();
             resetWaveTimer();
 
             healthText.kill();
-            healthText = new FlxText(0, 0, FlxG.width, "Health:");
-            healthText.setFormat(null, 16, 0x5cbf49, "left");
+            healthText = new FlxText(0, 3, FlxG.width, "Health:");
+            healthText.setFormat("04B", 16, 0x5cbf49, "left");
             add(healthText);
+
+            startMusic();
         }
 
         private function getWaveInterval():Number
@@ -630,7 +664,7 @@ package
             if(level == 0)
             {
 //                return 25;
-                return 10;
+                return 25;
             }
             else if(level == 1)
             {
@@ -638,11 +672,11 @@ package
             }
             else if(level == 2)
             {
-                return 15;
+                return 13;
             }
             else if(level == 3)
             {
-                return 10;
+                return 11;
             }
             else if(level == 10)
             {
@@ -671,6 +705,34 @@ package
         private function spawnKittenAnimated(x:Number,y:Number):void
         {
             kittensAnimated.add(new KittenAnimated(x, y));
+        }
+
+        private function startMusic():void
+        {
+            if(FlxG.music != null)
+            {
+                FlxG.music.stop();
+            }
+            if(FlxG.level==0)
+            {
+                FlxG.playMusic(Music0,1);
+            }
+            else if(FlxG.level==1)
+            {
+                FlxG.playMusic(Music1,1);
+            }
+            else if(FlxG.level==2)
+            {
+                FlxG.playMusic(Music2,1);
+            }
+            else if(FlxG.level==3)
+            {
+                FlxG.playMusic(Music3,1);
+            }
+            else if(FlxG.level==10)
+            {
+                FlxG.playMusic(Music4,1);
+            }
         }
 
     }

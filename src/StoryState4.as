@@ -15,9 +15,9 @@ package
             add(background);
 
             var text:FlxText= new FlxText(0, FlxG.height/3, FlxG.width,
-                                "BigEmpire are desperate. They are throwing everything they have at you.\n Good luck. \nPress space to continue");
+                                "BigEmpire are desperate. They are throwing everything they have at you.\n Good luck. \n \nPress space to continue");
             //text.setFormat(null, 16, 0xFFFFFF, "center");
-            text.setFormat(null, 16, 0x487e9d, "center");
+            text.setFormat("04B", 16, 0x487e9d, "center");
             add(text);
         }
 

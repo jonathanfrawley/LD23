@@ -15,9 +15,9 @@ package
             add(background);
 
             var text:FlxText= new FlxText(0, FlxG.height/3, FlxG.width,
-                                "BigEmpire have been defeated! LittleEarth celebrates a successful counterattack! A period of peace begins in the galaxy. \nPress space to continue");
+                                "BigEmpire have been defeated! LittleEarth celebrates a successful counterattack! A new era of peace begins in the galaxy. \n \nPress space to continue");
             //text.setFormat(null, 16, 0xFFFFFF, "center");
-            text.setFormat(null, 16, 0x487e9d, "center");
+            text.setFormat("04B", 16, 0x487e9d, "center");
             add(text);
         }
 

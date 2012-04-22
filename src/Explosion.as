@@ -4,7 +4,8 @@ package
 
     public class Explosion extends FlxSprite
     {
-        [Embed(source="../media/explosion.png")] public var ExplosionImage:Class;
+//        [Embed(source="../media/explosion.png")] public var ExplosionImage:Class;
+        [Embed(source="../media/explosion_anim.png")] public var ExplosionImage:Class;
 
         private var w : Number = 16;
         private var h : Number = 16;
@@ -16,9 +17,14 @@ package
 
         public function Explosion(x: Number, y: Number):void
         {
-            super(x - w, y - h, ExplosionImage);
+//            super(x - w, y - h, ExplosionImage);
+            super(x - w, y - h);
+            loadGraphic(ExplosionImage,true);
             realx = x;
             realy = y;
+
+            addAnimation("Default",[0,1,2,3],8);
+            play("Default");
 //            super(x, y, ExplosionImage);
         }
 

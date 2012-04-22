@@ -5,6 +5,7 @@ package
     public class Rock extends FlxSprite
     {
         [Embed(source="../media/rock.png")] private var RockImage:Class;
+        [Embed(source="../media/rock2.png")] private var Rock2Image:Class;
 
         private var type:int;
         private var w : Number = 16;
@@ -14,8 +15,17 @@ package
 
         public function Rock(x: Number, y: Number, rockType:int):void
         {
+            var img:Class;
             //super(x, y, RockImage);
-            super(x - w, y - h, RockImage);
+            if(rockType<2)
+            {
+                img = RockImage;
+            }
+            else
+            {
+                img = Rock2Image;
+            }
+            super(x - w, y - h, img);
             realx = x;
             realy = y;
 

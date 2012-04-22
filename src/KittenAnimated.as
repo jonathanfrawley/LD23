@@ -29,7 +29,6 @@ package
 
         override public function update():void
         {
-
             if(x<0)
             {
                 x=FlxG.width;
