@@ -21,7 +21,7 @@ package
             // checking if the player pressed SPACE...
             if (FlxG.keys.pressed("SPACE"))
             {
-                FlxG.switchState(new SplashState());
+                FlxG.switchState(new SplashStateAgain());
             }
             super.update();
         }

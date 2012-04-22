@@ -10,7 +10,7 @@ package
         {
 //            super(640,480,PlayState,1);
             super(640,480,SplashState,1);
-//            forceDebugger = true;
+            forceDebugger = true;
         }
     }
 }

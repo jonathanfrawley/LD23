@@ -32,7 +32,7 @@ package
         private var win:Boolean;
         private var winTimerText:FlxText;
         private var waveTimerText:FlxText;
-        private var level:int;
+        public var level:int;
         private static var currentMusic:int = -1;
         private var kittens:FlxGroup;
         private var kittensAnimated:FlxGroup;
@@ -40,7 +40,7 @@ package
         private var scoreText:FlxText;
         private var healthText:FlxText;
 
-        private var levelTime:Number;
+//        private var levelTime:Number;
         private var spawnInterval:Number;
         private var playerHealth:Number;
 
@@ -56,12 +56,14 @@ package
         override public function create():void
         {
             init();
-            setLevel(0);
+            //FlxG.level=10;
+            setLevel(FlxG.level);
+            //setLevel(1);
         }
 
-        private function init():void
+        public function init():void
         {
-            level = 0;
+//            level = FlxG.Level;
 
             gameOver = false;
             win = false;
@@ -114,9 +116,7 @@ package
             resetWaveTimer();
 
             winTimer = 30;
-
-
-            winTimerText = new FlxText(0, 0, FlxG.width, new String(winTimer));
+            winTimerText = new FlxText(0, 0, FlxG.width, "");
             winTimerText.setFormat(null, 16, 0x76a2c4, "center");
             add(winTimerText);
 
@@ -185,15 +185,39 @@ package
                     //var newState:PlayState = new PlayState();
                     //newState.setLevel(level+1);
                     //FlxG.switchState(newState);
-                    if(level==4)
+/*
+                    if(level==3)
                     {
+                        FlxG.level = 0;
                         FlxG.switchState(new CreditsState());
                     }
                     else
                     {
-                        init();
-                        setLevel(this.level+1);
+*/
+                    //init();
+                    //setLevel(this.level+1);
+                    if(this.level==0)
+                    {
+                        FlxG.level++;
+                        FlxG.switchState(new StoryState2());
                     }
+                    else if(this.level==1)
+                    {
+                        FlxG.level++;
+                        FlxG.switchState(new StoryState3());
+                    }
+                    else if(this.level==2)
+                    {
+                        FlxG.level++;
+                        FlxG.switchState(new StoryState4());
+                    }
+
+                    else if(this.level==3)
+                    {
+                        FlxG.level++;
+                        FlxG.switchState(new StoryState5());
+                    }
+ //                   }
                 }
             }
             else
@@ -267,26 +291,35 @@ package
                     waveTimerText.kill();
                 }
 
-                winTimer -= FlxG.elapsed;
-                if(winTimer < 0)
+                if(level != 10)
                 {
-                    win = true;
-                    var winText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
-                            "You Win\nScore:" + new String(FlxG.score) + "\nPress space to continue");
-                    winText.setFormat(null, 16, 0x5cbf49, "center");
-                    add(winText);
+                    winTimer -= FlxG.elapsed;
+                    if(winTimer < 0)
+                    {
+                        win = true;
+                        var winText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
+                                "You Win\nScore:" + new String(FlxG.score) + "\nPress space to continue");
+                        winText.setFormat(null, 16, 0x5cbf49, "center");
+                        add(winText);
+                    }
+
+                    winTimerText.kill();
+                    winTimerText = new FlxText(0, 0, FlxG.width, new String(Math.round(winTimer)));
+                    winTimerText.setFormat(null, 16, 0x76a2c4, "center");
+                    add(winTimerText)
+
+                    scoreText.kill();
+                    scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "\nLevel:" + new String(level));
+                    scoreText.setFormat(null, 16, 0x76a2c4, "right");
+                    add(scoreText);
                 }
-
-                winTimerText.kill();
-                winTimerText = new FlxText(0, 0, FlxG.width, new String(Math.round(winTimer)));
-                winTimerText.setFormat(null, 16, 0x76a2c4, "center");
-                add(winTimerText)
-
-                scoreText.kill();
-                scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "\nLevel:" + new String(level));
-                scoreText.setFormat(null, 16, 0x76a2c4, "right");
-                add(scoreText);
-
+                else
+                {
+                    scoreText.kill();
+                    scoreText = new FlxText(0, 0, FlxG.width, "Score:" + new String(FlxG.score) + "\nLevel: Infinite");
+                    scoreText.setFormat(null, 16, 0x76a2c4, "right");
+                    add(scoreText);
+                }
             }
 
             super.update();
@@ -444,7 +477,7 @@ package
             {
                 player.kill();
                 var gameOverText:FlxText = new FlxText(0, FlxG.height / 2 + 100, FlxG.width,
-                        "GAME OVER\nPress space to restart");
+                        "GAME OVER\nScore:" + new String(FlxG.score) + "\nPress space to restart");
                 gameOverText.setFormat(null, 16, 0xbf4949, "center");
                 add(gameOverText);
     //            FlxG.play(SoundExplosionShip);
@@ -556,23 +589,32 @@ package
             if(level==0)
             {
                 spawnInterval = 2.5;
-                winTimer = 30;
-                //winTimer = 3;
+                //winTimer = 30;
+                winTimer = 3;
             }
             else if(level==1)
             {
                 spawnInterval = 1.5;
-                winTimer = 30;
+                //winTimer = 30;
+                winTimer = 3;
             }
             else if(level==2)
             {
                 spawnInterval = 1.0;
-                winTimer = 30;
+                //winTimer = 30;
+                winTimer = 3;
             }
             else if(level==3)
             {
                 spawnInterval = 0.5;
-                winTimer = 30;
+                //winTimer = 30;
+                winTimer = 3;
+            }
+            else if(level==10)
+            {
+                spawnInterval = 0.5;
+                //winTimer = 30;
+                winTimer = 100000000;
             }
             resetSpawnTimer();
             resetWaveTimer();
@@ -599,6 +641,10 @@ package
                 return 15;
             }
             else if(level == 3)
+            {
+                return 10;
+            }
+            else if(level == 10)
             {
                 return 10;
             }
