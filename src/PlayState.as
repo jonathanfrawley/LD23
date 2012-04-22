@@ -26,69 +26,25 @@ package
         private var gameOver:Boolean;
         private var spawnTimer:Number;
         private var spawnInterval:Number = 2.5;
+        private var waveTimer:Number;
+        private var waveInterval:Number = 10.0;
         private var winTimer:Number;
         private var win:Boolean;
         private var winTimerText:FlxText;
+        private var waveTimerText:FlxText;
         private var level:int;
         private static var currentMusic:int = -1;
+        private var kittens:FlxGroup;
+        private var kittensAnimated:FlxGroup;
+
+        //private static var kittenChance:int = 0.1;
+        private static var kittenChance:int = 1.0;
 
         //private var explosionSound0:FlxSound;
 
         override public function create():void
         {
             init();
-/*
-            level = 0;
-
-            gameOver = false;
-            win = false;
-
-            //Background
-            background = new FlxSprite(0, 0, BackgroundImageClass);
-            add(background);
-
-            //Create player
-            player = new Player((FlxG.width/2), (FlxG.height/2), 32, 32);
-            player.maxVelocity.x = 80;
-            player.maxVelocity.y = 80;
-            add(player);
-
-
-            //Rocks
-            rocks = new FlxGroup();
-            add(rocks);
-
-            //Enemy Ships
-            enemyShips = new FlxGroup();
-            add(enemyShips);
-
-            //Bullets
-            bullets = new FlxGroup();
-            add(bullets);
-
-            //Cursor
-            cursor = new Cursor();
-            add(cursor);
-
-            //Explosions
-            explosions = new FlxGroup();
-            add(explosions);
-
-            //Explosion spots, where we click
-            explosionSpots = new FlxGroup();
-            add(explosionSpots);
-
-            //reset spawn timer
-            resetSpawnTimer();
-
-            winTimer = 30;
-
-            winTimerText = new FlxText(0, 0, FlxG.width, new String(winTimer));
-            winTimerText.setFormat(null, 16, 0x76a2c4, "center");
-            add(winTimerText);
-
-            //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
-*/
         }
 
         private function init():void
@@ -104,8 +60,6 @@ package
 
             //Create player
             player = new Player((FlxG.width/2), (FlxG.height/2), 32, 32);
-            player.maxVelocity.x = 80;
-            player.maxVelocity.y = 80;
             add(player);
 
             /*
@@ -144,6 +98,9 @@ package
             //reset spawn timer
             resetSpawnTimer();
 
+            //wave timer
+            resetWaveTimer();
+
             //winTimer = 30;
             winTimer = 30;
 
@@ -152,7 +109,19 @@ package
             winTimerText.setFormat(null, 16, 0x76a2c4, "center");
             add(winTimerText);
 
+            waveTimerText = new FlxText(0, 0, FlxG.width, "");
+            waveTimerText.setFormat(null, 16, 0x76a2c4, "left");
+            add(waveTimerText);
+
             //explosionSound0 = FlxG.loadSound(ExplosionSound0, 1.0, false, false, false);
+            kittens = new FlxGroup();
+            add(kittens);
+
+            kittensAnimated = new FlxGroup();
+            add(kittensAnimated);
+
+            spawnKittenAnimated(10,10);
+            spawnKitten(10,10);
         }
 
         override public function update():void
@@ -196,7 +165,8 @@ package
                 {
                     if(FlxG.music == null)
                     {
-                        FlxG.playMusic(Music0,1);
+                        //TODO:Enable for multiple levels
+//                        FlxG.playMusic(Music0,1);
                         currentMusic = level;
                     }
                 }
@@ -206,6 +176,9 @@ package
                 FlxG.overlap(rocks, player, overlapRocksPlayer);
                 FlxG.overlap(enemyShips, player, overlapShipsPlayer);
                 FlxG.overlap(enemyShips, explosions, overlapShipsExplosions);
+                FlxG.overlap(kittens, explosions, overlapKittensExplosions);
+                FlxG.overlap(kittensAnimated, enemyShips, overlapKittensBadGuy);
+                FlxG.overlap(kittensAnimated, rocks, overlapKittensBadGuy);
 
                 //Simple ai movement
                 //rock.x += 5;
@@ -229,6 +202,31 @@ package
                         spawnEnemyShip();
                     }
                     resetSpawnTimer();
+                }
+
+                waveTimer -= FlxG.elapsed;
+                if(waveTimer<(winTimer-1)) //Otherwise we don't care.
+                {
+                    if(waveTimer < 0)
+                    {
+                        waveEnemyShip();
+                        resetWaveTimer();
+                    }
+                    else if(waveTimer < 5)
+                    {
+                        waveTimerText.kill();
+                        waveTimerText = new FlxText(0, 100, FlxG.width, "NEXT WAVE IN: " + new String(Math.round(waveTimer)));
+                        waveTimerText.setFormat(null, 16, 0xbf4949, "center");
+                        add(waveTimerText)
+                    }
+                    else
+                    {
+                        waveTimerText.kill();
+                    }
+                }
+                else
+                {
+                    waveTimerText.kill();
                 }
 
                 winTimer -= FlxG.elapsed;
@@ -379,9 +377,21 @@ package
         {
             var emitter:FlxEmitter = createRockEmitter();
             emitter.at(rock);
+            //possibleSpawnItem(rock.realx, rock.realy);
+            //possibleSpawnItem(rock.x, rock.y);
+            explosion.kill();
             rock.kill();
             FlxG.play(ExplosionSound0,1,false);
+            possibleSpawnItem(explosion.realx, explosion.realy);
             //explosionSound0.play();
+        }
+
+        private function possibleSpawnItem(x:Number,y:Number):void
+        {
+            if(Math.random() < kittenChance)
+            {
+                spawnKitten(x,y);
+            }
         }
 
         private function overlapRocksPlayer(rock: Rock, player:Player):void
@@ -406,6 +416,18 @@ package
         private function resetSpawnTimer():void
         {
             spawnTimer = spawnInterval;
+/*
+            spawnInterval *= 0.95;
+            if(spawnInterval < 0.1)
+            {
+                spawnInterval = 0.1;
+            }
+*/
+        }
+
+        private function resetWaveTimer():void
+        {
+            waveTimer = getWaveInterval();
 /*
             spawnInterval *= 0.95;
             if(spawnInterval < 0.1)
@@ -444,10 +466,71 @@ package
             FlxG.play(ExplosionSound0,1,false);
         }
 
+        private function overlapKittensExplosions(kitten:Kitten, explosion:Explosion):void
+        {
+            kitten.kill()
+            explosion.kill();
+            spawnKittenAnimated(kitten.realx, kitten.realy);
+        }
+
+        private function overlapKittensBadGuy(kittenAnim:KittenAnimated, badguy:FlxSprite):void
+        {
+            badguy.kill();
+
+            var emitter:FlxEmitter = createRockEmitter();
+            emitter.at(badguy);
+            badguy.kill();
+            FlxG.play(ExplosionSound0,1,false);
+        }
+
         public function setLevel(level:int):void
         {
             this.level = level;
-            //Do some extra stuff here...
+            //Do some extra stuff here...make levels harder as we increase.
+        }
+
+        private function getWaveInterval():Number
+        {
+            if(level == 0)
+            {
+//                return 25;
+                return 10;
+            }
+            else if(level == 1)
+            {
+                return 20;
+            }
+            else if(level == 2)
+            {
+                return 15;
+            }
+            else if(level == 3)
+            {
+                return 10;
+            }
+            else
+            {
+                return 20;
+            }
+        }
+
+        private function waveEnemyShip():void
+        {
+            var waveAmount:int = 10;
+            for(var i:int=0;i<waveAmount;i++)
+            {
+                spawnEnemyShip();
+            }
+        }
+
+        private function spawnKitten(x:Number,y:Number):void
+        {
+            kittens.add(new Kitten(x, y));
+        }
+
+        private function spawnKittenAnimated(x:Number,y:Number):void
+        {
+            kittensAnimated.add(new KittenAnimated(x, y));
         }
 
     }

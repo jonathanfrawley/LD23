@@ -11,9 +11,14 @@ package
         private var hangAroundTime : Number = 0.5;
         private var currentTime : Number = 0;
 
+        public var realx:Number;
+        public var realy:Number;
+
         public function Explosion(x: Number, y: Number):void
         {
             super(x - w, y - h, ExplosionImage);
+            realx = x;
+            realy = y;
 //            super(x, y, ExplosionImage);
         }
 
